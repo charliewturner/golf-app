@@ -15,14 +15,11 @@ export default function App() {
   // }, []);
 
   useEffect(() => {
-    fetch("https://api.golfcourseapi.com/v1/search", {
-      headers: {
-        Authorization: `Key ${import.meta.env.API_KEY}`,
-      },
-    })
+    fetch("http://localhost:8000/courses/search")
       .then((res) => res.json())
       .then((data) => console.log(data));
   }, []);
+
   return (
     <>
       <div style={{ padding: 16 }}>
