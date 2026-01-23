@@ -14,10 +14,17 @@ export default function App() {
   //     .catch(() => setStatus("API error"));
   // }, []);
 
+  // useEffect(() => {
+  //   fetch("http://localhost:8000/v1/search")
+  //     .then((res) => res.json())
+  //     .then((data) => console.log(data));
+  // }, []);
+
+  //return to add editable search parameter
   useEffect(() => {
-    fetch("http://localhost:8000/courses/search")
+    fetch("http://localhost:8000/courses/search?q=pinehurst")
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) => console.log(data.courses));
   }, []);
 
   return (

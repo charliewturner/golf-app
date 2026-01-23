@@ -11,26 +11,54 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/courses/search", async (_req, res) => {
+app.get("/courses/search", async (req, res) => {
   try {
-    const response = await fetch("https://api.golfcourseapi.com/v1/search", {
-      headers: {
-        Authorization: `Key ${process.env.API_KEY}`,
+    const searchQuery = req.query.q; // frontend passes ?q=
+    if (!searchQuery) {
+      return res.status(400).json({ error: "Missing search query" });
+    }
+
+    const response = await fetch(
+      `https://api.golfcourseapi.com/v1/search?search_query=${encodeURIComponent(searchQuery)}`,
+      {
+        headers: { Authorization: `Key ${process.env.API_KEY}` },
       },
-    });
+    );
 
     if (!response.ok) {
       const text = await response.text();
-      return res.status(response.status).json({
-        error: "GolfCourseAPI error",
-        details: text,
-      });
+      return res.status(response.status).json({ error: text });
+    }
+
+    const data = await response.json();
+    res.json(data); // passes { courses: [...] } to frontend
+  } catch (err) {
+    res.status(500).json({ error: "Server error", details: err });
+  }
+});
+
+app.get("/v1/courses/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log("Fetching course ID:", req.params.id);
+  try {
+    const response = await fetch(
+      `https://api.golfcourseapi.com/v1/courses/${id}`,
+      {
+        headers: {
+          Authorization: `Key ${process.env.API_KEY}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      return res.status(response.status).json({ error: text });
     }
 
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: "Server error", err });
+    res.status(500).json({ error: "Server error", details: err });
   }
 });
 
